@@ -8,4 +8,5 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.6.1
+	gorm.io/gorm v1.25.9
 )
