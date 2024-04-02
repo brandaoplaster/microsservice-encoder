@@ -43,5 +43,6 @@ go.work
 .history
 .ionide
 .pgdata
+.env
 
 # End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode
