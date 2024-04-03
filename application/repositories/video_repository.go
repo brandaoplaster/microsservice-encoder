@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/brandaoplaster/encoder/domain"
+	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 )
 
 type VideoRepository interface {
