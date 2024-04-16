@@ -60,3 +60,15 @@ func (upload *VideoUpload) LoadPaths() error {
 	}
 	return nil
 }
+
+func getClientUpload() (*storage.Client, context.Context, error) {
+	context := context.Background()
+
+	client, erro := storage.NewClient(context)
+
+	if erro != nil {
+		return nil, nil, erro
+	}
+
+	return client, context, nil
+}
