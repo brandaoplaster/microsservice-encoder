@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"cloud.google.com/go/storage"
@@ -43,5 +44,19 @@ func (upload *VideoUpload) UploadObject(objectPath string, client *storage.Clien
 		return erro
 	}
 
+	return nil
+}
+
+func (upload *VideoUpload) LoadPaths() error {
+	erro := filepath.Walk(upload.VideoPath, func(path string, info os.FileInfo, erro error) error {
+		if !info.IsDir() {
+			upload.Paths = append(upload.Paths, path)
+		}
+		return nil
+	})
+
+	if erro != nil {
+		return erro
+	}
 	return nil
 }
