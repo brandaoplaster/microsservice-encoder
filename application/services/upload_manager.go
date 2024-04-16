@@ -3,8 +3,10 @@ package services
 import (
 	"context"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"cloud.google.com/go/storage"
@@ -71,4 +73,52 @@ func getClientUpload() (*storage.Client, context.Context, error) {
 	}
 
 	return client, context, nil
+}
+
+func (upload *VideoUpload) ProcessUpload(concurrency int, doneUpload chan string) error {
+	in := make(chan int, runtime.NumCPU())
+	returnChannel := make(chan string)
+
+	erro := upload.LoadPaths()
+	if erro != nil {
+		return erro
+	}
+
+	uploadClient, context, erro := getClientUpload()
+	if erro != nil {
+		return erro
+	}
+
+	for process := 0; process < concurrency; process++ {
+		go upload.uploadWorker(in, returnChannel, uploadClient, context)
+	}
+
+	go func() {
+		for x := 0; x < len(upload.Paths); x++ {
+			in <- x
+		}
+		close(in)
+	}()
+
+	for r := range returnChannel {
+		if r != "" {
+			doneUpload <- r
+			break
+		}
+	}
+
+	return nil
+}
+
+func (upload *VideoUpload) uploadWorker(int chan int, returnChan chan string, uploadClient *storage.Client, context context.Context) {
+	for x := range int {
+		erro := upload.UploadObject(upload.Paths[x], uploadClient, context)
+		if erro != nil {
+			upload.Errors = append(upload.Errors, upload.Paths[x])
+			log.Printf("Error during the upload: %v. Error: %v", upload.Paths[x], erro)
+			returnChan <- erro.Error()
+		}
+		returnChan <- ""
+	}
+	returnChan <- "Upload completed"
 }
