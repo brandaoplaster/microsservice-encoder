@@ -51,4 +51,7 @@ func TestVideoServiceDownload(test *testing.T) {
 
 	err = videoService.Encode()
 	require.Nil(test, err)
+
+	err = videoService.Finish()
+	require.Nil(test, err)
 }
